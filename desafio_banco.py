@@ -53,7 +53,7 @@ class PessoaJuridica(Cliente):
     return self._razao_social
   
 class Conta:
-  def __int__(self, numero: int, cliente: Cliente, agencia = "0001"):
+  def __init__(self, cliente: Cliente, numero: int, agencia = "0001"):
     self._numero = numero
     self._agencia = agencia
     self._cliente = cliente
@@ -77,9 +77,10 @@ class Conta:
     return self._historico
   
   @classmethod
-  def nova_conta(cls, cliente: Cliente, numero : int):
-    return cls(numero, cliente)
+  def nova_conta(cls, cliente: Cliente, numero : int, agencia = "0001"):
+    return cls(cliente, numero, agencia)
   
+  @property
   def saldo(self) -> float:
     return self._saldo
   
@@ -97,9 +98,9 @@ class Conta:
     return False
   
 class ContaCorrente(Conta):
-  def __init__(self, numero: int, cliente: Cliente, agencia = "0001", 
+  def __init__(self, cliente: Cliente, numero: int, agencia = "0001", 
                limite = 500, limite_saque = 3):
-    super().__init__(numero, cliente, agencia)
+    super().__init__(cliente, numero, agencia)
     self._limite = limite
     self._limite_saque = limite_saque
     
@@ -125,7 +126,7 @@ class ContaCorrente(Conta):
     
   def __str__(self):
     return f'''
-      Titular: {self._cliente.nome}
+      Titular: {self.cliente.nome}
       Conta: {self._numero}
       Agencia: {self._agencia}
       Saldo: {self._saldo}
@@ -163,8 +164,7 @@ class Saque(Transacao):
   @property
   def valor(self):
     return self._valor
-  
-  @classmethod
+
   def registrar(self, conta : Conta):
     if conta.sacar(self._valor):
       conta.historico.adicionar_transacao(self)
@@ -180,14 +180,22 @@ class Deposito(Transacao):
     if conta.depositar(self._valor):
       conta.historico.adicionar_transacao(self)
       
-
-def busca_cliente_conta(clientes : list) -> tuple[PessoaFisica, Conta, str]:
+def busca_cliente(clientes : list) -> tuple[PessoaFisica, str]:
   cpf = input("Informe o CPF: ")
 
   cliente = filtrar_cliente(cpf, clientes)
 
   if not cliente:
     print("\n@@@ Cliente nao encontrado. @@@")
+    return None, cpf
+  
+  return cliente, cpf
+  
+def busca_cliente_conta(clientes : list) -> tuple[PessoaFisica, Conta]:
+
+  cliente, cpf = busca_cliente(clientes)
+
+  if cliente is None:
     return None, None, cpf
   
   conta = recuperar_conta(cliente)
@@ -195,10 +203,10 @@ def busca_cliente_conta(clientes : list) -> tuple[PessoaFisica, Conta, str]:
   if not conta:
     return cliente, None, cpf
   
-  return cliente, conta, cpf
+  return cliente, conta
 
 def transacao(func, clientes : list) -> bool:
-  cliente, conta, _ = busca_cliente_conta(clientes)
+  cliente, conta= busca_cliente_conta(clientes)
   
   if cliente is None: 
     return False
@@ -227,7 +235,7 @@ def sacar(clientes : list):
     print("\n@@@ Operacao de saque falhou! @@@")
 
 def exibir_extrato(clientes : list):
-  cliente, conta, _ = busca_cliente_conta(clientes)
+  cliente, conta = busca_cliente_conta(clientes)
   
   if cliente is None: 
     return None 
@@ -251,27 +259,28 @@ def exibir_extrato(clientes : list):
   print(f"\n Saldo: {conta.saldo:.2f}")  
   print("\n=======================")   
 
-def filtrar_cliente(cpf : str, clientes : list) -> list[PessoaFisica]:
-  return [cliente for cliente in clientes if cliente.cpf == cpf]
+def filtrar_cliente(cpf : str, clientes : list):
+  clientes_filtrados = [cliente for cliente in clientes if cliente.cpf == cpf]
+  return clientes_filtrados[0] if clientes_filtrados else None
 
-# FIXME : AttributeError: 'NoneType' object has no attribute 'contas'
-def recuperar_conta(clientes : list):
-  cliente, _, _ = busca_cliente_conta(clientes)
+def recuperar_conta(cliente: Cliente)-> Cliente:
+  
   if cliente is None:
     return None
+  
   if not cliente.contas:
-    
     return None
+  
   else:
     print("\n==== Contas do cliente ====")
-    for index, conta in cliente.contas:
+    for index, conta in enumerate(cliente.contas):
       print(f"[{index}] : {conta}")
       
     conta = int(input("Informe o numero da conta: "))
     return cliente.contas[conta]
 
 def criar_cliente(clientes : list):
-  cliente, _, cpf= busca_cliente_conta(clientes)
+  cliente, cpf = busca_cliente(clientes)
   
   if cliente:
     print("\n@@@ Ja existe um cliente com esse CPF! @@@") 
@@ -287,13 +296,13 @@ def criar_cliente(clientes : list):
   print("\n@@@ Cliente criado com sucesso! @@@")
     
 def criar_conta( clientes : list, contas : list):
-  cliente, _, _ = busca_cliente_conta(clientes)
+  cliente, _= busca_cliente(clientes)
   
   if cliente is None : 
     print("\n@@@ Fluxo encerrado! @@@")
     return
   
-  nova_conta = ContaCorrente.nova_conta(cliente, len(cliente.contas) + 1)
+  nova_conta = ContaCorrente.nova_conta(cliente, len(contas) + 1, )
   contas.append(nova_conta)
   cliente.adicionar_conta(nova_conta)
   
