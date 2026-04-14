@@ -1,2 +1,22 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Custom for Python
+*.py text eol=lf
+*.ipynb text eol=lf
+
+# Custom for configuration and documentation
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+.gitignore text eol=lf
+.env* text eol=lf
+
+# Binary files
+*.pyc binary
+*.pyo binary
+*.pyd binary
+*.db binary
+*.sqlite binary
