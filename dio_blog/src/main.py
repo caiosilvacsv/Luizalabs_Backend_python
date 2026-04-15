@@ -2,8 +2,9 @@ from contextlib   import asynccontextmanager
 
 from fastapi      import FastAPI
 
-from controllers  import post, auth
-from database     import database
+from src.controllers  import auth
+from src.database     import database
+from src.controllers import post
 
 # Gerencia os eventos de inicialização e encerramento da aplicação
 

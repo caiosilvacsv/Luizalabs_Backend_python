@@ -1,9 +1,9 @@
 from fastapi      import Depends, status, APIRouter
 
-from service.post import PostService
-from security     import login_required
-from schemas.post import PostIn
-from views.post   import PostOut
+from src.service.post import PostService
+from src.security     import login_required
+from src.schemas.post import PostIn
+from src.views.post   import PostOut
 
 
 #Exemplo de logging para o FastAPI e uvicorn

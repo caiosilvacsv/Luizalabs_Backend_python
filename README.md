@@ -145,9 +145,16 @@ Para evitar bloqueios de segurança do Windows (Device Guard) e garantir que tod
 poetry run python -m uvicorn main:app --reload
 ```
 
+ou
+Para rodar o projeto com a nova estrutura em `src/`:
+
+```powershell
+poetry run python -m uvicorn src.main:app --reload
+```
+
 ---
 
-### 💡 Comandos Rápidos de Verificação
+### 4.💡 Comandos Rápidos de Verificação
 
 Se quiser confirmar se tudo foi instalado corretamente após o clone:
 
@@ -156,6 +163,16 @@ Se quiser confirmar se tudo foi instalado corretamente após o clone:
 * **Verificar se o Python é o correto:** `poetry run python --version` (Deve retornar 3.14.2)
 
 ---
+
+### 5. Dica para o VS Code
+
+Agora que o código está em `src`, o VS Code pode se confundir com os caminhos.
+
+1. Abra as configurações (`Ctrl + ,`).
+2. Procure por **"Python Analysis Extra Paths"**.
+3. Adicione `./src`.
+
+Isso vai garantir que o IntelliSense continue encontrando seus `controllers` e `models` sem sublinhados vermelhos chatos.
 
 **Dica para o Git:** Lembre-se de nunca subir a pasta `.venv` para o seu repositório. O seu arquivo `.gitignore` deve conter:
 

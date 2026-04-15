@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from database import metadata
+from src.database import metadata
 
 #Criando uma tabela com sqlalchemy
 posts = sa.Table(
