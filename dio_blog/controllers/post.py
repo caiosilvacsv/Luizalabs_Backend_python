@@ -1,112 +1,50 @@
-from typing import Annotated
+from fastapi      import HTTPException, status, APIRouter
 
-from fastapi import Cookie, Header, Response, status, APIRouter
-from datetime import datetime, UTC
+from database     import database
+from service.post import PostService
+from models.post  import posts
+from schemas.post import PostIn
+from views.post   import PostOut
+
 
 #Exemplo de logging para o FastAPI e uvicorn
 import logging
 
-from views.post import PostOut
-from schemas.post import PostIn
 
 logger = logging.getLogger("uvicorn.info")
 logger.setLevel(logging.INFO)
 
-#Fake DB
-#Exemplo de banco de dados
-fake_DB = [
-    {
-      "title": "Criando uma aplicação com FASTAPI",
-      'author': "teste",
-      "published_at": "2026-04-10T13:17:01.575868+00:00",
-      "published": True
-    },
-    {
-      "title": "Internacionalizando um app com Django",
-      'author': "teste",
-      "published_at": "2026-04-10T13:17:01.575871+00:00",
-      "published": True
-    },
-    {
-      "title": "Criando uma aplicação com Django",
-      'author': "teste",
-      "published_at": "2026-04-10T13:17:01.575874+00:00",
-      "published": True
-    },
-    {
-      "title": "Internacionalizando um app com FastAPI",
-      'author': "teste",
-      "published_at": "2026-04-10T13:17:01.575877+00:00",
-      "published": False
-    }
-]
-
-
 router = APIRouter(
     prefix = '/posts',
     tags= ['posts',],
-    
   )
 
+service = PostService()
 
-#Exemplo com Path parameters
-@router.get('/{framework}', response_model = PostOut)
-def read_post(framework: str):
-  return {
-      "posts": [
-        {
-          'title': f'Criando uma aplicação com {framework}',
-          'published_at': datetime.now(UTC),
-        },
-        {
-          'title': f'Internacionalizando um app com {framework}',
-          'published_at': datetime.now(UTC),
-        }
-      ]
-    }
-
-#Exemplo com Query parameters
+#CRUD - GET - Ler os posts
 @router.get('/', response_model = list[PostOut])
-def read_posts( published: bool, limit: int, skip: int = 0 ):
-  # Modo simples de ser feito, mas falho em escala.
-  # Pois anteriormente limit era descrito como "limit: int = len(fake_DB) 
-  return [post for post in fake_DB[skip: skip + limit] 
-          if post['published'] is published]
+async def read_posts( published: bool, limit: int, skip: int = 0 ):
+  return await service.real_all(published, limit, skip)
 
-#Exemplo de Request body
+
+#CRUD - POST - Criar um post
 @router.post('/',status_code = status.HTTP_201_CREATED, response_model = PostOut)
-def create_post(post: PostIn):
-  fake_DB.append(post.model_dump())
-  return post
+async def create_post(post: PostIn):
+  return {**post.model_dump(), "id": await service.create(post)}
 
-#Exemplo de cookies
-@router.get('/cookie', response_model = list[PostOut])
-def read_post(
-    published: bool,
-    limit: int,
-    response: Response,
-    skip: int = 0,
-    ads_id: Annotated[str | None, Cookie()] = None
-):
-  response.set_cookie(key = "user", value= "luizalabs@gmail.com")
-  logger.info(f"Cookie: {ads_id}")
-  return [post for post in fake_DB[skip: skip + limit] 
-          if post['published'] is published]
-  
-#Exemplo de headers
-@router.get('/headers', response_model = list[PostOut])
-def read_post(
-    published: bool,
-    limit: int,
-    response: Response,
-    skip: int = 0,
-    ads_id: Annotated[str | None, Cookie()] = None,
-    user_agent: Annotated[str | None, Header()] = None,
-): 
-  response.set_cookie(key = "user", value= "luizalabs@gmail.com")
-  logger.info(f"Cookie: {ads_id}")
-  logger.info(f"User-Agent: {user_agent}")
-  return [post for post in fake_DB[skip: skip + limit] 
-          if post['published'] is published]
-  
- 
+
+#CRUD - GET - Ler um post pelo id
+@router.get('/{id}', response_model = PostOut)
+async def read_post(id: int):
+  return await service.read(id)
+
+#CRUD - PATCH - Atualizar um post pelo id
+@router.patch('/{id}', response_model = PostOut)
+async def update_post(id: int, post: PostIn):
+  return await service.update(id, post)
+
+
+#CRUD - DELETE - Deletar um post pelo id
+@router.delete('/{id}', status_code = status.HTTP_204_NO_CONTENT, response_model=None)
+async def delete_post(id: int):
+  await service.delete(id)

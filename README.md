@@ -165,3 +165,23 @@ __pycache__/
 *.py[cod]
 .python-version
 ```
+
+### 💡  Dicas de Desenvolvimento
+
+#### 🛠️ Configurando o VS Code
+
+Se estiver usando o VS Code, é essencial apontar para o ambiente virtual correto para que o autocomplete (IntelliSense) funcione:
+
+Aperte ```Ctrl + Shift + P```.
+
+Digite "```Python: Select Interpreter```".
+
+Selecione o interpretador que está no caminho do seu projeto: ```.\.venv\Scripts\python.exe```.
+
+#### 📦 Gerenciando Dependências
+
+Listar pacotes: ```poetry show```
+
+Ver árvore de dependências: ```poetry show --tree```
+
+Adicionar novo pacote: ```bash poetry add <nome-do-pacote>```
