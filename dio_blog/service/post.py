@@ -35,18 +35,34 @@ class PostService:
     Args:
         post (PostIn): Post
 
+    raises:
+        HTTPException: Post already exists
+        HTTPException: Error internal server
+    
     Returns:
         int: _id do post criado
     """
-    command = posts.insert(). values(
-      title = post.title,
-      content = post.content,
-      published_at = post.published_at,
-      published = post.published,
-    )
-    
-    return await database.execute(command)
-  
+    try:
+      command = posts.insert(). values(
+        title = post.title,
+        content = post.content,
+        published_at = post.published_at,
+        published = post.published,
+      )
+      
+      return await database.execute(command)
+    except Exception as e:
+      # Verifica se o erro é de restrição de unicidade do SQLite
+      if "UNIQUE constraint failed" in str(e):
+        raise HTTPException(
+          status_code = status.HTTP_400_BAD_REQUEST,
+          detail = "Post already exists",
+        )
+      # Caso seja outro erro, lança o erro original
+      raise HTTPException(
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail = "Error internal server",
+      )
   # Busca um post pelo id
   async def read(
     self,
@@ -91,12 +107,24 @@ class PostService:
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Post not found",
       )
+    try:  
+      data = post.model_dump(exclude_unset = True)
+      command = posts.update().where(posts.c.id == id).values(**data)
+      await database.execute(command)
     
-    data = post.model_dump(exclude_unset = True)
-    command = posts.update().where(posts.c.id == id).values(**data)
-    await database.execute(command)
-    
-    return await self.__get_by_id(id)
+      return await self.__get_by_id(id)
+    except Exception as e:
+      # Verifica se o erro é de restrição de unicidade do SQLite
+      if "UNIQUE constraint failed" in str(e):
+        raise HTTPException(
+          status_code = status.HTTP_400_BAD_REQUEST,
+          detail = "Post already exists",
+        )
+      # Caso seja outro erro, lança o erro original
+      raise HTTPException(
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail = "Error internal server",
+      )
   
   # Deleta um post
   async def delete(
@@ -136,7 +164,7 @@ class PostService:
         )
     return post
   
-  # Conta quantos posts existem
+  # Conta quantos posts existem com o certo id
   async def count(
     self, 
     id: int

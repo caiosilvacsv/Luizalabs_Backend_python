@@ -1,8 +1,7 @@
-from fastapi      import HTTPException, status, APIRouter
+from fastapi      import Depends, status, APIRouter
 
-from database     import database
 from service.post import PostService
-from models.post  import posts
+from security     import login_required
 from schemas.post import PostIn
 from views.post   import PostOut
 
@@ -17,6 +16,7 @@ logger.setLevel(logging.INFO)
 router = APIRouter(
     prefix = '/posts',
     tags= ['posts',],
+    dependencies = [Depends(login_required)],
   )
 
 service = PostService()
