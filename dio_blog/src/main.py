@@ -2,14 +2,15 @@ from contextlib   import asynccontextmanager
 
 from fastapi      import FastAPI
 
-from src.controllers  import auth
-from src.database     import database
-from src.controllers import post
+from src.controllers  import auth, post
+from src.database     import database, engine
+from src.models.post  import metadata
 
 # Gerencia os eventos de inicialização e encerramento da aplicação
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    metadata.create_all(engine)
     await database.connect()
     yield
     await database.disconnect()

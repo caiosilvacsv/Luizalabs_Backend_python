@@ -36,8 +36,8 @@ class PostService:
         post (PostIn): Post
 
     raises:
-        HTTPException: Post already exists
-        HTTPException: Error internal server
+        HTTPException: Post already exists - 400
+        HTTPException: Error internal server - 500
     
     Returns:
         int: _id do post criado
@@ -58,11 +58,6 @@ class PostService:
           status_code = status.HTTP_400_BAD_REQUEST,
           detail = "Post already exists",
         )
-      # Caso seja outro erro, lança o erro original
-      raise HTTPException(
-        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail = "Error internal server",
-      )
   # Busca um post pelo id
   async def read(
     self,
@@ -97,6 +92,8 @@ class PostService:
 
     Raises:
         HTTPException: post não encontrado - 404
+        HTTPException: post ja existe - 400
+        HTTPException: erro interno do servidor - 500
 
     Returns:
         Record: Post
@@ -120,11 +117,6 @@ class PostService:
           status_code = status.HTTP_400_BAD_REQUEST,
           detail = "Post already exists",
         )
-      # Caso seja outro erro, lança o erro original
-      raise HTTPException(
-        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail = "Error internal server",
-      )
   
   # Deleta um post
   async def delete(
