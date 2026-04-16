@@ -2,7 +2,7 @@ from contextlib   import asynccontextmanager
 
 from fastapi      import FastAPI
 
-from src.controllers  import auth, post
+from src.controllers  import post, auth
 from src.database     import database, engine
 from src.models.post  import metadata
 
