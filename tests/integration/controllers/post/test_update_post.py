@@ -5,8 +5,8 @@ import pytest_asyncio
 
 @pytest_asyncio.fixture(autouse = True)
 async def populate_posts(db):
-  from schemas.post import PostIn
-  from service.post import PostService
+  from src.schemas.post import PostIn
+  from src.service.post import PostService
   
   service = PostService()
   await service.create(PostIn(
