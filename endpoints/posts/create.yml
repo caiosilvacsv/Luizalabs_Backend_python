@@ -1,0 +1,23 @@
+info:
+  name: create
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:8000/posts
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Fazenod testes de como isso funciona",
+        "author": "testante",
+        "published_at" : "2026-04-10T13:17:01.575871Z"  
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

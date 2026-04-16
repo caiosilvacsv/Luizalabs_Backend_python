@@ -1,0 +1,4 @@
+name: Local-FastAPI
+variables:
+  - name: base_url
+    value: https://luizalabs-backend-python.onrender.com

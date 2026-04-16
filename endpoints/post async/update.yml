@@ -1,0 +1,27 @@
+info:
+  name: update
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{base_url}}/posts/:id"
+  params:
+    - name: id
+      value: "2"
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "title": "Finalmente finalizado isto!",
+        "content": "Depois de muita luta, pois isto se tornou um pouco antigo, consegui finalizar, com pouco conhecimento a mais",
+        "published": "True"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

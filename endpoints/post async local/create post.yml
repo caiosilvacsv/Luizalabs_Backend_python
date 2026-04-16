@@ -1,0 +1,22 @@
+info:
+  name: create post
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{localhost}}/posts/"
+  body:
+    type: json
+    data: |-
+      {
+       "title": "Teste numero 3",
+        "content": "Contem um texto maravilhosamente incrivel!"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
