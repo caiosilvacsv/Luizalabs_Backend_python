@@ -33,3 +33,10 @@ jobs:
         # Definimos o PYTHONPATH para que o pytest encontre a pasta src
         export PYTHONPATH=$PYTHONPATH:$(pwd)/src
         poetry run pytest
+  deploy:
+    needs: test 
+    runs-on: ubuntu-latest
+        
+    steps:
+      - name: Disparar Deploy no Render
+        run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
