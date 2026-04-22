@@ -10,10 +10,25 @@ http:
     type: json
     data: |-
       {
-       "title": "Teste numero ",
-        "content": "Contem um texto maravilhosamente incrivel!"
+       "title": "Fazendo um post no render após ter configurado o Postgres ",
+        "content": "Contem um texto maravilhosamente incrivel!",
+        "published": "on",
+        "published_at": "{{tempo_agora}}"
       }
   auth: inherit
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        // Pega a data e hora exata do momento do disparo
+        const dataAtual = new Date();
+
+        // Converte para o padrão ISO 8601 com fuso horário UTC (ex: 2026-04-21T22:22:24.123Z)
+        const dataIso = dataAtual.toISOString();
+
+        // Salva isso em uma variável do Bruno para usarmos no Body
+        bru.setVar("tempo_agora", dataIso);
 
 settings:
   encodeUrl: true
