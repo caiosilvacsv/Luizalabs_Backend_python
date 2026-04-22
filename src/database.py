@@ -1,8 +1,9 @@
+import os
 import databases
 import sqlalchemy as sa
 
 # Define a string de conexão para um banco de dados SQLite local
-DATABASE_URL = "sqlite:///./blog.db"
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./blog.db")
 
 # Instância assíncrona do banco, usada para as operações (CRUD) nas rotas
 database = databases.Database(DATABASE_URL)
