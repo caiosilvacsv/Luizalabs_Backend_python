@@ -60,7 +60,21 @@ class ClientService:
   
   async def read_client(self, client_id : int) -> ClientOut | None:
     read = clients.select().where(clients.c.id == client_id)
-    return await database.fetch_one(read)
+    client = await database.fetch_one(read)
+    
+    # 1. Garante que o cliente existe para não gerar um TypeError
+    if not client:
+      raise ClientNotFoundError(client_id)
+      
+    # 2. Converte para dicionário para tratar possíveis valores Nulos no banco
+    result = dict(client)
+    if result.get("status") is None:
+      result["status"] = True
+      
+    if result["status"] == False:
+      raise ClientNotFoundError(client_id)  
+      
+    return result
     
   async def read_client_with_account(
     self,

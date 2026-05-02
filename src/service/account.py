@@ -1,7 +1,7 @@
 
 from decimal import Decimal
 from databases.interfaces import Record
-from sqlalchemy import update
+from sqlalchemy import select, update
 from src.exceptions.business import AccountNotCreatedError, AccountNotFoundError, NotUpdatedError
 from src.models.current_account import current_accounts
 from src.models.account import accounts
@@ -18,7 +18,9 @@ class AccountService:
       agency = account.agency,
       account_number = account.account_number,
       account_digit = account.account_digit,
-      client_id = account.client_id
+      client_id = account.client_id,
+      balance = account.balance,
+      is_active = account.is_active
     )
     
     account = await database.execute(new_account)
@@ -33,7 +35,7 @@ class AccountService:
     client_id : int,
     limit : int,
     skip : int = 0,
-  ) -> list[Record] | None:
+  ) -> list[AccountOut] | None:
     
     query = (
         accounts.select()
@@ -74,17 +76,15 @@ class AccountService:
   async def read_current_account_limit(
     self,
     account_id: int
-    ) -> Record | None:
+    ) -> Decimal | None:
     query = (
-      current_accounts
-      .select(
+      select(
         current_accounts.c.daily_limit
-      ).
-      where(
+      ).where(
         current_accounts.c.account_id == account_id,
       )
     )
-    return await database.fetch_one(query)
+    return await database.fetch_val(query)
   
   async def update_current_account_limit(
     self,
@@ -107,6 +107,6 @@ class AccountService:
   async def read_current_account_balance(
     self,
     account_id: int
-    ) -> Record | None:
-    query = accounts.select(accounts.c.balance).where(accounts.c.id == account_id)
-    return await database.fetch_one(query)
+    ) -> Decimal | None:
+    query = select(accounts.c.balance).where(accounts.c.id == account_id)
+    return await database.fetch_val(query)

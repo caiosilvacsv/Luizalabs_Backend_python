@@ -8,8 +8,8 @@ from src.schemas.statement import StatementOut
 
 class AccountBase(BaseModel):
   agency : int 
-  balance : Decimal = Field(..., max_digits = 10, decimal_places = 2)
-  is_active : bool
+  balance : Decimal = Field(default=Decimal('0.00'), max_digits = 10, decimal_places = 2)
+  is_active : bool = True
   account_number : int
   account_digit : int
   

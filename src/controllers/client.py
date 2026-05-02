@@ -24,7 +24,7 @@ async def create_client(client : ClientIn) -> int:
   return await client_service.create(client)
 
 @router.get(
-  "/{client_id}",
+  "/read/{client_id}",
   response_model = ClientOut,
   tags = ["client"]
 )
@@ -32,7 +32,7 @@ async def read_client(client_id : int) -> ClientOut | None:
   return await client_service.read_client(client_id)
 
 @router.patch(
-  "/{client_id}",
+  "/update/{client_id}",
   response_model = ClientOut,
   tags = ["client"]
 )

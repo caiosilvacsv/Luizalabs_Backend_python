@@ -26,7 +26,7 @@ class TransactionService:
   ) -> Record:
     balance : Decimal
     
-    account = self.__find_account(statement.account_id)
+    account = await self.__find_account(statement.account_id)
     
     if statement.type_transaction == TypeTransaction.WITHDRAWAL : 
       balance = await self.__withdrawal(statement, account)
@@ -54,10 +54,12 @@ class TransactionService:
     if account['balance'] < statement.amount:
       raise InsufficientBalance(account['id'])
     
+    print('passou 1')
     limit_available: Decimal = await self.daily_limit(account['id'])
   
     if limit_available < statement.amount:
       raise DailyLimitExceeded(account['id'])
+    print('passou')
     
     return account["balance"] - statement.amount
     
@@ -134,9 +136,9 @@ class TransactionService:
     # Terceiro, calcula e retorna o limite restante
     return total_limit - total_withdrawn
 
-  async def read_account_with_statement(self, account_id: int) -> dict:
+  async def read_account_with_statement(self, account_id : int) -> dict:
     # 1. Busca os detalhes da conta
-    account = self.__find_account(account_id)
+    account = await self.__find_account(account_id)
         
     # 2. Busca todas as transações (extrato) dessa conta
     statement_query = statements.select().where(statements.c.account_id == account_id)
@@ -156,7 +158,7 @@ class TransactionService:
     statement: StatementIn
   ) -> int : 
     command = statements.insert().values(
-      amout = statement.amount,
+      amount = statement.amount,
       type_transaction = statement.type_transaction,
       description = statement.description,
       account_id = statement.account_id

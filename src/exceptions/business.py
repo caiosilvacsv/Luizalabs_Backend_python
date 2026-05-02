@@ -67,3 +67,10 @@ class DailyLimitExceeded(BankExceptionBase):
     self.account_id = account_id
     super().__init__(message + f" {account_id}", status_code)
     
+class AccountNumberExists(BankExceptionBase):
+  def __init__(
+    self, 
+    message : str = "Account number already exists",
+    status_code : int = status.HTTP_422_UNPROCESSABLE_CONTENT,
+  ):
+    super().__init__(message, status_code)
